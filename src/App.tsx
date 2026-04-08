@@ -1,121 +1,138 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+// 全局动画样式
+import './styles/animations.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
 
+// 路由级代码分割
+const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
+const GamePage = lazy(() => import('./pages/GamePage').then(m => ({ default: m.GamePage })));
+const ResultPage = lazy(() => import('./pages/ResultPage').then(m => ({ default: m.ResultPage })));
+const PracticePage = lazy(() => import('./pages/PracticePage').then(m => ({ default: m.PracticePage })));
+
+// 加载骨架屏
+function PageLoader() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className="min-h-screen min-h-[100dvh] flex items-center justify-center overscroll-none">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin" />
+        <p className="text-white/60 text-sm">加载中...</p>
+      </div>
+    </div>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="min-h-screen min-h-[100dvh] overscroll-none ios-safe-area">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* 首页：/ */}
+            <Route path="/" element={<HomePageWrapper />} />
+            {/* 游戏页：/game/:level */}
+            <Route path="/game/:level" element={<GamePageWrapper />} />
+            {/* 结果页：/result */}
+            <Route path="/result" element={<ResultPageWrapper />} />
+            {/* 练习页：/practice */}
+            <Route path="/practice" element={<PracticePageWrapper />} />
+            {/* 兜底重定向 */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+// ─── 页面包装器 ─────────────────────────────────────────────────
+
+import { useGameStore } from './store/gameStore';
+import { useParams } from 'react-router-dom';
+
+function HomePageWrapper() {
+  const { startGame } = useGameStore();
+  const navigate = useNavigate();
+
+  const handleStart = () => {
+    startGame();
+    navigate('/game/1');
+  };
+
+  return (
+    <div className="min-h-screen min-h-[100dvh] bg-gradient-to-b from-orange-500 via-amber-600 to-orange-700 overscroll-none">
+      <HomePage onStartGame={handleStart} />
+    </div>
+  );
+}
+
+function GamePageWrapper() {
+  const { level } = useParams<{ level: string }>();
+  const { setLevel, goHome } = useGameStore();
+  const navigate = useNavigate();
+
+  // 根据 URL 参数同步 store 关卡（仅挂载时执行一次，避免无限循环）
+  useEffect(() => {
+    if (level) {
+      const lvl = parseInt(level, 10) as 1 | 2 | 3 | 4;
+      if (!isNaN(lvl)) {
+        setLevel(lvl);
+      }
+    }
+  }, [level, setLevel]);
+
+  const handleFinish = () => {
+    goHome();
+    navigate('/');
+  };
+
+  return (
+    <div className="min-h-screen min-h-[100dvh] bg-gradient-to-b from-indigo-900 via-purple-900 to-purple-950 overscroll-none">
+      <GamePage onFinish={handleFinish} />
+    </div>
+  );
+}
+
+function ResultPageWrapper() {
+  const { replayLevel, goToNextLevel, resetGame, goHome } = useGameStore();
+  const navigate = useNavigate();
+
+  const handleReplay = () => {
+    replayLevel();
+    navigate('/');
+  };
+
+  const handleGoHome = () => {
+    resetGame();
+    goHome();
+    navigate('/');
+  };
+
+  const handleNextLevel = () => {
+    goToNextLevel();
+    navigate('/');
+  };
+
+  return (
+    <div className="min-h-screen min-h-[100dvh] bg-gradient-to-b from-indigo-900 via-purple-900 to-purple-950 overscroll-none">
+      <ResultPage
+        onReplay={handleReplay}
+        onGoHome={handleGoHome}
+        onNextLevel={handleNextLevel}
+      />
+    </div>
+  );
+}
+
+function PracticePageWrapper() {
+  const navigate = useNavigate();
+  const handleBack = () => navigate('/');
+
+  return (
+    <div className="min-h-screen min-h-[100dvh] bg-gradient-to-b from-indigo-900 via-purple-900 to-purple-950 overscroll-none">
+      <PracticePage onBack={handleBack} />
+    </div>
+  );
+}
+
+export default App;

@@ -1,0 +1,596 @@
+/* ============================================================
+   拼音学习游戏 — 全局动画关键帧
+   参考：~/.openclaw/shared/notes/designer/animation-spec.md
+   ============================================================ */
+
+/* ─── CSS 变量 ─────────────────────────────────────────────── */
+:root {
+  --duration-short: 150ms;
+  --duration-normal: 250ms;
+  --duration-long: 400ms;
+  --duration-extra: 600ms;
+
+  --ease-standard: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  --color-primary: #4AA8E8;
+  --color-accent: #FF8C42;
+  --color-bg: #FFF9F0;
+  --color-success: #4CAF50;
+  --color-error: #FF5252;
+}
+
+/* ─── 1. correct-flash ────────────────────────────────────── */
+/* 正确答案：选项变绿 + 打勾 spring 放大 */
+@keyframes correct-flash {
+  0% {
+    transform: scale(1);
+    background-color: rgba(76, 175, 80, 0);
+    border-color: rgba(224, 224, 224, 1);
+    box-shadow: 0 0 0 rgba(76, 175, 80, 0);
+  }
+  30% {
+    transform: scale(1.06);
+    background-color: rgba(232, 245, 233, 1);
+    border-color: rgba(76, 175, 80, 1);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
+  }
+  60% {
+    transform: scale(0.97);
+    background-color: rgba(232, 245, 233, 1);
+    border-color: rgba(76, 175, 80, 1);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+  }
+  80% {
+    transform: scale(1.03);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.35);
+  }
+  100% {
+    transform: scale(1);
+    background-color: rgba(232, 245, 233, 1);
+    border-color: rgba(76, 175, 80, 1);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+  }
+}
+
+/* ─── 2. wrong-shake ───────────────────────────────────────── */
+/* 错误答案：水平抖动 + 变红 */
+@keyframes wrong-shake {
+  0% {
+    transform: translateX(0) scale(1);
+    background-color: rgba(255, 82, 82, 0);
+    border-color: rgba(224, 224, 224, 1);
+  }
+  10% {
+    transform: translateX(-6px) scale(0.98);
+    background-color: rgba(255, 235, 238, 1);
+    border-color: rgba(255, 82, 82, 1);
+  }
+  25% {
+    transform: translateX(6px) scale(0.98);
+    background-color: rgba(255, 235, 238, 1);
+    border-color: rgba(255, 82, 82, 1);
+  }
+  40% {
+    transform: translateX(-4px) scale(0.99);
+  }
+  55% {
+    transform: translateX(4px) scale(0.99);
+  }
+  70% {
+    transform: translateX(-2px) scale(1);
+  }
+  85% {
+    transform: translateX(2px) scale(1);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    background-color: rgba(255, 235, 238, 1);
+    border-color: rgba(255, 82, 82, 1);
+  }
+}
+
+/* ─── 3. star-burst ───────────────────────────────────────── */
+/* 星星爆炸：从点击位置扩散爆发 */
+@keyframes star-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.3) rotate(20deg);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1) rotate(-10deg);
+  }
+  80% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1.6) rotate(15deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.2) rotate(30deg);
+  }
+}
+
+/* 星星内发光脉冲 */
+@keyframes star-glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(255, 200, 50, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(255, 200, 50, 0.9));
+  }
+}
+
+/* ─── 4. combo-pulse ───────────────────────────────────────── */
+/* 连击脉冲（3连蓝 / 6连橙 / 10连红狂热） */
+
+/* 基础脉冲 */
+@keyframes combo-pulse {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.35); }
+  55% { transform: scale(0.92); }
+  75% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* 蓝色光圈（3-5连） */
+@keyframes combo-blue-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+    box-shadow: 0 0 0 0 rgba(74, 168, 232, 0.5);
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.2;
+    box-shadow: 0 0 0 8px rgba(74, 168, 232, 0);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgba(74, 168, 232, 0);
+  }
+}
+
+/* 橙色光晕 + 小星星（6-9连） */
+@keyframes combo-orange-glow {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.2) rotate(5deg);
+    filter: brightness(1.3);
+  }
+  50% {
+    transform: scale(1.4) rotate(-3deg);
+    filter: brightness(1.5);
+  }
+  75% {
+    transform: scale(1.1) rotate(2deg);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+}
+
+@keyframes comet-tail {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 20px), var(--ty, -30px)) scale(0.2);
+  }
+}
+
+/* 红色狂热（10+连） */
+@keyframes combo-red-flash {
+  0% {
+    opacity: 0;
+    background-color: rgba(255, 50, 50, 0);
+  }
+  15% {
+    opacity: 1;
+    background-color: rgba(255, 50, 50, 0.18);
+  }
+  40% {
+    opacity: 0.8;
+    background-color: rgba(255, 50, 50, 0.1);
+  }
+  70% {
+    opacity: 1;
+    background-color: rgba(255, 50, 50, 0.15);
+  }
+  100% {
+    opacity: 0;
+    background-color: rgba(255, 50, 50, 0);
+  }
+}
+
+@keyframes flame-flicker {
+  0%, 100% {
+    filter: brightness(1) hue-rotate(0deg);
+    transform: scaleY(1);
+  }
+  33% {
+    filter: brightness(1.3) hue-rotate(10deg);
+    transform: scaleY(1.05);
+  }
+  66% {
+    filter: brightness(1.1) hue-rotate(-5deg);
+    transform: scaleY(0.97);
+  }
+}
+
+/* 连击中断 */
+@keyframes combo-break {
+  0% {
+    transform: scale(1);
+    color: #4AA8E8;
+    opacity: 1;
+  }
+  40% {
+    transform: scale(1.3);
+    color: #FF5252;
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.7);
+    color: #888888;
+    opacity: 0.5;
+  }
+}
+
+/* ─── 5. page-fade ────────────────────────────────────────── */
+/* 页面切换淡入淡出 */
+@keyframes page-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-fade-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* 游戏页进入 */
+@keyframes game-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 结果页进入 */
+@keyframes result-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ─── 6. score-pop ────────────────────────────────────────── */
+/* 得分飘字 +10 +2 +5 等 */
+@keyframes score-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.2);
+  }
+  40% {
+    transform: translateY(-20px) scale(0.95);
+  }
+  60% {
+    transform: translateY(-30px) scale(1.05);
+  }
+  80% {
+    opacity: 0.9;
+    transform: translateY(-42px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-55px) scale(0.9);
+  }
+}
+
+/* 得分板数字弹跳 */
+@keyframes score-bounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.25); }
+  60% { transform: scale(0.9); }
+  80% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* ─── 7. heart-fall ───────────────────────────────────────── */
+/* 心形生命值坠落消失 */
+@keyframes heart-fall {
+  0% {
+    transform: scale(1) translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.25) translateY(-4px) rotate(-8deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.9) translateY(4px) rotate(5deg);
+    opacity: 0.8;
+  }
+  75% {
+    transform: scale(0.4) translateY(10px) rotate(-10deg);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(0) translateY(18px) rotate(-20deg);
+    opacity: 0;
+  }
+}
+
+/* 心形变灰（断连时） */
+@keyframes heart-gray {
+  0% { filter: grayscale(0); transform: scale(1); }
+  50% { filter: grayscale(1); transform: scale(0.9); }
+  100% { filter: grayscale(1); transform: scale(0.8); }
+}
+
+/* ─── 通用工具类 ───────────────────────────────────────────── */
+
+/* 打勾图标出现 */
+@keyframes tick-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-45deg);
+  }
+  60% {
+    transform: scale(1.25) rotate(0deg);
+  }
+  80% {
+    transform: scale(0.88) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* X 图标出现 */
+@keyframes x-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.25);
+  }
+  80% {
+    transform: scale(0.88);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 屏幕震动 */
+@keyframes screen-shake {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(-3px); }
+  30%  { transform: translateX(3px); }
+  45%  { transform: translateX(-2px); }
+  60%  { transform: translateX(2px); }
+  80%  { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+/* 正确答案揭示（边框闪烁） */
+@keyframes correct-reveal {
+  0%   { border-color: #4CAF50; background: rgba(232,245,233,1); }
+  30%  { border-color: #FFFFFF; background: rgba(255,255,255,1); }
+  60%  { border-color: #4CAF50; background: rgba(232,245,233,1); }
+  100% { border-color: #4CAF50; background: rgba(232,245,233,1); }
+}
+
+/* 星星下落 */
+@keyframes star-drop {
+  0% {
+    transform: translateY(-60px) scale(0.3) rotate(-20deg);
+    opacity: 0;
+  }
+  55% {
+    transform: translateY(6px) scale(1.1) rotate(8deg);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(-10px) scale(0.93) rotate(-5deg);
+    opacity: 1;
+  }
+  85% {
+    transform: translateY(4px) scale(1.06) rotate(3deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* 光芒扩散 */
+@keyframes glow-expand {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* 选项入场 */
+@keyframes option-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 选项淡出 */
+@keyframes option-exit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+}
+
+/* 面板弹出 */
+@keyframes panel-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 遮罩淡入 */
+@keyframes overlay-fade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ─── 动画类名 ─────────────────────────────────────────────── */
+
+.animate-correct-flash {
+  animation: correct-flash 400ms var(--ease-spring) forwards;
+}
+
+.animate-wrong-shake {
+  animation: wrong-shake 450ms var(--ease-standard) forwards;
+}
+
+.animate-tick-appear {
+  animation: tick-appear 300ms var(--ease-spring) forwards;
+}
+
+.animate-x-appear {
+  animation: x-appear 300ms var(--ease-spring) forwards;
+}
+
+.animate-screen-shake {
+  animation: screen-shake 400ms var(--ease-standard) forwards;
+}
+
+.animate-correct-reveal {
+  animation: correct-reveal 500ms var(--ease-standard) forwards;
+}
+
+.animate-star-drop {
+  animation: star-drop 500ms var(--ease-spring) forwards;
+}
+
+.animate-star-burst {
+  animation: star-burst 600ms var(--ease-exit) forwards;
+}
+
+.animate-combo-pulse {
+  animation: combo-pulse 400ms var(--ease-spring) forwards;
+}
+
+.animate-combo-break {
+  animation: combo-break 300ms var(--ease-enter) forwards;
+}
+
+.animate-score-pop {
+  animation: score-pop 900ms var(--ease-enter) forwards;
+}
+
+.animate-heart-fall {
+  animation: heart-fall 350ms var(--ease-enter) forwards;
+}
+
+.animate-page-enter {
+  animation: page-fade-in 350ms var(--ease-enter) both;
+}
+
+.animate-game-enter {
+  animation: game-enter 350ms var(--ease-standard) both;
+}
+
+.animate-result-enter {
+  animation: result-enter 400ms var(--ease-spring) both;
+}
+
+.animate-option-enter {
+  animation: option-enter 250ms var(--ease-spring) both;
+}
+
+.animate-option-exit {
+  animation: option-exit 200ms var(--ease-enter) both;
+}
+
+.animate-panel-pop {
+  animation: panel-pop 300ms var(--ease-spring) both;
+}
+
+.animate-overlay-fade {
+  animation: overlay-fade 200ms var(--ease-standard) both;
+}
+
+/* ─── prefers-reduced-motion ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
