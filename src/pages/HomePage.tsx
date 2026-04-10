@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/gameStore';
 import { LEVEL_CONFIGS, STATS } from '../data/pinyinData';
@@ -7,6 +7,9 @@ import { loadProgress, getCompletedLevelCount } from '../utils/storageUtils';
 import type { GameLevel } from '../utils/storageUtils';
 import { playClickSound } from '../utils/audioUtils';
 import { APP_VERSION } from '../version';
+import { useStickerCollection, canFreeDraw, freeDrawCountdown } from '../hooks/useStickerCollection';
+import { StickerToast } from '../components/StickerToast';
+import type { Sticker } from '../types/sticker';
 
 interface HomePageProps {
   onStartGame: () => void;
@@ -45,6 +48,7 @@ const LEVEL_EMOJIS: Record<GameLevel, string> = {
 export function HomePage({ onStartGame }: HomePageProps) {
   const navigate = useNavigate();
   const { level, setLevel, unlockedLevels, highScore } = useGameStore();
+  const { grantFreeSticker, collection: stickerCollection, progress: stickerProgress } = useStickerCollection();
   const [soundMuted, setSoundMuted] = useState(() => {
     try {
       const raw = localStorage.getItem('pinyin_audio_muted');
@@ -52,6 +56,26 @@ export function HomePage({ onStartGame }: HomePageProps) {
     } catch {}
     return false;
   });
+  const [freeDrawResult, setFreeDrawResult] = useState<{ sticker: Sticker; isNew: boolean } | null>(null);
+  const [cd, setCd] = useState(0);
+
+  const hasFree = canFreeDraw(stickerCollection);
+
+  useEffect(() => {
+    setCd(freeDrawCountdown(stickerCollection));
+    const id = setInterval(() => setCd(freeDrawCountdown(stickerCollection)), 1000);
+    return () => clearInterval(id);
+  }, [stickerCollection]);
+
+  const handleFreeDraw = () => {
+    playClickSound();
+    const result = grantFreeSticker();
+    if (result) setFreeDrawResult(result);
+  };
+
+  const cdHours = Math.floor(cd / 3600);
+  const cdMin = Math.floor((cd % 3600) / 60);
+  const cdSec = cd % 60;
 
   const progress = loadProgress();
   const records = progress.levelRecords;
@@ -198,16 +222,42 @@ export function HomePage({ onStartGame }: HomePageProps) {
         🚀 开始挑战 · 第{level}关
       </GameButton>
 
-      {/* ─── 贴纸册入口 ─────────────────────────────────── */}
-      <button
-        onClick={() => {
-          playClickSound();
-          navigate('/collection');
-        }}
-        className="w-full max-w-md min-h-[48px] rounded-2xl bg-white/10 hover:bg-white/15 ring-1 ring-white/10 text-white/80 font-semibold text-sm transition-all active:scale-95 touch-manipulation"
-      >
-        📖 贴纸册
-      </button>
+      {/* ─── 贴纸免费抽 / 收集册入口 ───────────────────── */}
+      <div className="w-full max-w-md flex gap-2">
+        {/* 免费抽取按钮 */}
+        {hasFree ? (
+          <button
+            onClick={handleFreeDraw}
+            className="flex-1 min-h-[52px] rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 ring-2 ring-pink-300/40 text-white font-black text-sm sm:text-base shadow-lg shadow-pink-500/30 transition-all active:scale-95 touch-manipulation"
+          >
+            🎰 每日免费抽
+            <span className="block text-xs opacity-80 font-normal mt-0.5">
+              已收集 {stickerProgress.unlocked}/{stickerProgress.total}
+            </span>
+          </button>
+        ) : (
+          <button
+            disabled
+            className="flex-1 min-h-[52px] rounded-2xl bg-white/5 ring-1 ring-white/10 text-white/40 font-semibold text-sm cursor-not-allowed"
+          >
+            ⏳ 明日再来
+            <span className="block text-xs opacity-60 font-normal mt-0.5">
+              {cdHours > 0 ? `${cdHours}h ` : ''}{cdMin}分 {cdSec}秒
+            </span>
+          </button>
+        )}
+
+        {/* 贴纸册入口 */}
+        <button
+          onClick={() => {
+            playClickSound();
+            navigate('/collection');
+          }}
+          className="w-[52px] min-h-[52px] rounded-2xl bg-white/10 hover:bg-white/15 ring-1 ring-white/10 text-white/80 font-semibold text-sm transition-all active:scale-95 touch-manipulation flex items-center justify-center"
+        >
+          📖
+        </button>
+      </div>
 
       {/* ─── 题库统计 ─────────────────────────────────────── */}
       <div className="text-center text-white/25 text-xs space-y-0.5">
@@ -221,6 +271,15 @@ export function HomePage({ onStartGame }: HomePageProps) {
       <div className="text-center">
         <span className="text-white/20 text-xs">v{APP_VERSION}</span>
       </div>
+
+      {/* 贴纸免费抽结果 */}
+      {freeDrawResult && (
+        <StickerToast
+          sticker={freeDrawResult.sticker}
+          isNew={freeDrawResult.isNew}
+          onClose={() => setFreeDrawResult(null)}
+        />
+      )}
     </div>
   );
 }

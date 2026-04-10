@@ -31,6 +31,7 @@ export interface StickerCollection {
   unlockedAt: Record<string, number>;
   totalPulls: number;
   lastPullAt: number;
+  lastFreeDrawAt: number;
 }
 
 export type StickerEvent = 'level_complete' | 'perfect_score' | 'first_play' | 'combo_10';
