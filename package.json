@@ -1,11 +1,12 @@
 {
   "name": "pinyin-game",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "bump": "npm version patch --no-git-tag-version && node scripts/bump-version.js",
+    "build": "npm run bump && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write ."

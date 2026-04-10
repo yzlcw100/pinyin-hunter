@@ -1,0 +1,228 @@
+import type { Sticker, StickerCategory } from '../types/sticker';
+import { Rarity } from '../types/sticker';
+
+export const ALL_STICKERS: Sticker[] = [
+  // ── Common (12) ──────────────────────────────────────────
+  {
+    id: 'sticker_cat',
+    name: '小猫',
+    image: '🐱',
+    rarity: Rarity.Common,
+    category: 'animal' as StickerCategory,
+    description: '可爱的小猫咪',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_dog',
+    name: '小狗',
+    image: '🐶',
+    rarity: Rarity.Common,
+    category: 'animal' as StickerCategory,
+    description: '忠诚的小狗狗',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_rabbit',
+    name: '小兔子',
+    image: '🐰',
+    rarity: Rarity.Common,
+    category: 'animal' as StickerCategory,
+    description: '蹦蹦跳跳的小兔子',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_panda',
+    name: '小熊猫',
+    image: '🐼',
+    rarity: Rarity.Common,
+    category: 'animal' as StickerCategory,
+    description: '黑白分明的小熊猫',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_bear',
+    name: '小熊',
+    image: '🐻',
+    rarity: Rarity.Common,
+    category: 'animal' as StickerCategory,
+    description: '圆滚滚的小熊',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_pig',
+    name: '小猪',
+    image: '🐷',
+    rarity: Rarity.Common,
+    category: 'animal' as StickerCategory,
+    description: '粉嘟嘟的小猪',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_frog',
+    name: '小青蛙',
+    image: '🐸',
+    rarity: Rarity.Common,
+    category: 'animal' as StickerCategory,
+    description: '呱呱叫的小青蛙',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_chick',
+    name: '小鸡',
+    image: '🐥',
+    rarity: Rarity.Common,
+    category: 'animal' as StickerCategory,
+    description: '毛茸茸的小鸡',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_fish',
+    name: '小鱼',
+    image: '🐟',
+    rarity: Rarity.Common,
+    category: 'animal' as StickerCategory,
+    description: '游来游去的小鱼',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_star',
+    name: '小星星',
+    image: '⭐',
+    rarity: Rarity.Common,
+    category: 'pinyin' as StickerCategory,
+    description: '闪闪的小星星',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_heart',
+    name: '小红心',
+    image: '❤️',
+    rarity: Rarity.Common,
+    category: 'pinyin' as StickerCategory,
+    description: '充满爱意的小红心',
+    unlockHint: '完成任意关卡即可获得',
+  },
+  {
+    id: 'sticker_sun',
+    name: '小太阳',
+    image: '🌞',
+    rarity: Rarity.Common,
+    category: 'pinyin' as StickerCategory,
+    description: '温暖的小太阳',
+    unlockHint: '完成任意关卡即可获得',
+  },
+
+  // ── Rare (5) ────────────────────────────────────────────
+  {
+    id: 'sticker_fox',
+    name: '小狐狸',
+    image: '🦊',
+    rarity: Rarity.Rare,
+    category: 'animal' as StickerCategory,
+    description: '聪明伶俐的小狐狸',
+    unlockHint: '连续答对5题以上',
+  },
+  {
+    id: 'sticker_koala',
+    name: '小考拉',
+    image: '🐨',
+    rarity: Rarity.Rare,
+    category: 'animal' as StickerCategory,
+    description: '爱睡觉的小考拉',
+    unlockHint: '单局得分超过100分',
+  },
+  {
+    id: 'sticker_penguin',
+    name: '小企鹅',
+    image: '🐧',
+    rarity: Rarity.Rare,
+    category: 'animal' as StickerCategory,
+    description: '摇摇晃晃的小企鹅',
+    unlockHint: '通关任意关卡',
+  },
+  {
+    id: 'sticker_dragon',
+    name: '小龙',
+    image: '🐲',
+    rarity: Rarity.Rare,
+    category: 'animal' as StickerCategory,
+    description: '神秘的小龙',
+    unlockHint: '累计抽取20次',
+  },
+  {
+    id: 'sticker_rainbow',
+    name: '彩虹',
+    image: '🌈',
+    rarity: Rarity.Rare,
+    category: 'pinyin' as StickerCategory,
+    description: '美丽的彩虹',
+    unlockHint: '集齐所有普通贴纸',
+  },
+
+  // ── Epic (3) ────────────────────────────────────────────
+  {
+    id: 'sticker_unicorn',
+    name: '独角兽',
+    image: '🦄',
+    rarity: Rarity.Epic,
+    category: 'animal' as StickerCategory,
+    description: '神奇的独角兽',
+    unlockHint: '累计抽取50次',
+  },
+  {
+    id: 'sticker_phoenix',
+    name: '凤凰',
+    image: '🦅',
+    rarity: Rarity.Epic,
+    category: 'animal' as StickerCategory,
+    description: '涅槃重生的凤凰',
+    unlockHint: '通关所有关卡',
+  },
+  {
+    id: 'sticker_trophy',
+    name: '冠军奖杯',
+    image: '🏆',
+    rarity: Rarity.Epic,
+    category: 'achievement' as StickerCategory,
+    description: '冠军的荣耀',
+    unlockHint: '任意关卡获得3星评价',
+  },
+
+  // ── Legendary (2) ───────────────────────────────────────
+  {
+    id: 'sticker_crown',
+    name: '王者皇冠',
+    image: '👑',
+    rarity: Rarity.Legendary,
+    category: 'achievement' as StickerCategory,
+    description: '至高无上的王者之冠',
+    unlockHint: '所有关卡均获得3星',
+  },
+  {
+    id: 'sticker_magic',
+    name: '魔法精灵',
+    image: '🧚',
+    rarity: Rarity.Legendary,
+    category: 'achievement' as StickerCategory,
+    description: '传说中的魔法精灵',
+    unlockHint: '收集全部22张贴纸',
+  },
+];
+
+export const STICKER_MAP: Record<string, Sticker> = Object.fromEntries(
+  ALL_STICKERS.map((s) => [s.id, s])
+);
+
+export const RARITY_WEIGHTS: Record<Rarity, number> = {
+  [Rarity.Common]: 60,
+  [Rarity.Rare]: 25,
+  [Rarity.Epic]: 10,
+  [Rarity.Legendary]: 5,
+};
+
+export const RARITY_ORDER: Rarity[] = [
+  Rarity.Common,
+  Rarity.Rare,
+  Rarity.Epic,
+  Rarity.Legendary,
+];

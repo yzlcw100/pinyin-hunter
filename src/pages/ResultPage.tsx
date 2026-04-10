@@ -1,6 +1,10 @@
 import { useGameStore, calculateStars, isLevelPassed } from '../store/gameStore';
 import { LEVEL_CONFIGS } from '../data/pinyinData';
 import { GameButton } from '../components/GameButton';
+import { useStickerCollection } from '../hooks/useStickerCollection';
+import { StickerToast } from '../components/StickerToast';
+import { useEffect, useState } from 'react';
+import type { Sticker } from '../types/sticker';
 
 interface ResultPageProps {
   onReplay: () => void;
@@ -27,6 +31,16 @@ function StarRow({ stars }: { stars: number }) {
 }
 
 export function ResultPage({ onReplay, onGoHome, onNextLevel }: ResultPageProps) {
+  const { grantSticker } = useStickerCollection();
+  const [rewardSticker, setRewardSticker] = useState<{ sticker: Sticker; isNew: boolean } | null>(null);
+
+  useEffect(() => {
+    const result = grantSticker('level_complete');
+    if (result.isNew) {
+      setRewardSticker(result);
+    }
+  }, [grantSticker]);
+
   const {
     score,
     correctCount,
@@ -180,6 +194,15 @@ export function ResultPage({ onReplay, onGoHome, onNextLevel }: ResultPageProps)
           🏠 返回首页
         </GameButton>
       </div>
+
+      {/* 贴纸奖励提示 */}
+      {rewardSticker && (
+        <StickerToast
+          sticker={rewardSticker.sticker}
+          isNew={rewardSticker.isNew}
+          onClose={() => setRewardSticker(null)}
+        />
+      )}
     </div>
   );
 }

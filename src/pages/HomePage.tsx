@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/gameStore';
 import { LEVEL_CONFIGS, STATS } from '../data/pinyinData';
 import { GameButton } from '../components/GameButton';
 import { loadProgress, getCompletedLevelCount } from '../utils/storageUtils';
 import type { GameLevel } from '../utils/storageUtils';
 import { playClickSound } from '../utils/audioUtils';
+import { APP_VERSION } from '../version';
 
 interface HomePageProps {
   onStartGame: () => void;
@@ -41,6 +43,7 @@ const LEVEL_EMOJIS: Record<GameLevel, string> = {
 };
 
 export function HomePage({ onStartGame }: HomePageProps) {
+  const navigate = useNavigate();
   const { level, setLevel, unlockedLevels, highScore } = useGameStore();
   const [soundMuted, setSoundMuted] = useState(() => {
     try {
@@ -195,12 +198,28 @@ export function HomePage({ onStartGame }: HomePageProps) {
         🚀 开始挑战 · 第{level}关
       </GameButton>
 
+      {/* ─── 贴纸册入口 ─────────────────────────────────── */}
+      <button
+        onClick={() => {
+          playClickSound();
+          navigate('/collection');
+        }}
+        className="w-full max-w-md min-h-[48px] rounded-2xl bg-white/10 hover:bg-white/15 ring-1 ring-white/10 text-white/80 font-semibold text-sm transition-all active:scale-95 touch-manipulation"
+      >
+        📖 贴纸册
+      </button>
+
       {/* ─── 题库统计 ─────────────────────────────────────── */}
       <div className="text-center text-white/25 text-xs space-y-0.5">
         <p>题库规模：{STATS.totalSyllables} 个音节 / {STATS.totalCharacters} 个汉字</p>
         <p>
           🌱{STATS.byDifficulty.L1} · 🌿{STATS.byDifficulty.L2} · 🌳{STATS.byDifficulty.L3} · 🏆{STATS.byDifficulty.L4}
         </p>
+      </div>
+
+      {/* ─── 版本号 ─────────────────────────────────────── */}
+      <div className="text-center">
+        <span className="text-white/20 text-xs">v{APP_VERSION}</span>
       </div>
     </div>
   );
