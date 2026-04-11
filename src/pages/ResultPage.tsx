@@ -1,6 +1,6 @@
 import { useGameStore, calculateStars, isLevelPassed } from '../store/gameStore';
 import { LEVEL_CONFIGS } from '../data/pinyinData';
-import { GameButton } from '../components/GameButton';
+import { APP_VERSION } from '../version';
 import { useStickerCollection } from '../hooks/useStickerCollection';
 import { StickerToast } from '../components/StickerToast';
 import { useEffect, useState } from 'react';
@@ -220,40 +220,50 @@ export function ResultPage({ onReplay, onGoHome, onNextLevel }: ResultPageProps)
       )}
 
       {/* ─── 操作按钮（响应式，最小高度 60px）────────── */}
-      <div className="flex flex-col gap-2 sm:gap-2.5 w-full max-w-xs sm:max-w-sm relative z-10">
-        {/* 第一行：重玩 + 下一关（或再玩一次） */}
-        <div className="flex gap-2 w-full">
-          {/* 重玩本关 */}
-          <GameButton variant="secondary" size="lg" onClick={onReplay} className="flex-1 min-h-[60px] text-base sm:text-lg">
-            🔄 重玩
-          </GameButton>
+      <div
+        className="w-full max-w-xs sm:max-w-sm relative z-10 flex flex-col gap-2"
+        style={{ minHeight: '140px' }}
+      >
+        {/* 调试标识：上线后删除 */}
+        <div className="text-center text-white/20 text-xs mb-1">v{APP_VERSION} · 第{level}关 · {passed ? '通过' : '失败'}</div>
 
-          {/* 下一关（仅未到最后一关时显示） */}
+        {/* 第一行：重玩 + 下一关 */}
+        <div className="flex gap-2 w-full">
+          <button
+            onClick={onReplay}
+            className="flex-1 min-h-[60px] rounded-2xl bg-blue-500 hover:bg-blue-400 active:scale-95 text-white font-bold text-base sm:text-lg shadow-lg transition-all"
+          >
+            🔄 重玩
+          </button>
+
           {hasNextLevel ? (
-            <GameButton
-              variant={passed ? 'primary' : 'ghost'}
-              size="lg"
+            <button
               onClick={onNextLevel}
-              className="flex-1 min-h-[60px] text-base sm:text-lg"
+              className={`flex-1 min-h-[60px] rounded-2xl font-bold text-base sm:text-lg shadow-lg transition-all active:scale-95 ${
+                passed
+                  ? 'bg-gradient-to-b from-yellow-400 to-yellow-500 text-yellow-900'
+                  : 'bg-white/10 border-2 border-white/20 text-white/60'
+              }`}
             >
               ➡️ 下一关
-            </GameButton>
+            </button>
           ) : (
-            <GameButton
-              variant="primary"
-              size="lg"
+            <button
               onClick={onReplay}
-              className="flex-1 min-h-[60px] text-base sm:text-lg"
+              className="flex-1 min-h-[60px] rounded-2xl bg-gradient-to-b from-yellow-400 to-yellow-500 text-yellow-900 font-bold text-base sm:text-lg shadow-lg transition-all active:scale-95"
             >
               🔄 再玩第{level}关
-            </GameButton>
+            </button>
           )}
         </div>
 
         {/* 返回首页 */}
-        <GameButton variant="ghost" size="md" onClick={onGoHome} className="w-full">
+        <button
+          onClick={onGoHome}
+          className="w-full min-h-[48px] rounded-2xl bg-white/10 border border-white/20 text-white/80 font-semibold text-sm transition-all active:scale-95 hover:bg-white/15"
+        >
           🏠 返回首页
-        </GameButton>
+        </button>
       </div>
 
       {/* 贴纸奖励提示（多个依次显示） */}
