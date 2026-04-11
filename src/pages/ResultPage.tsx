@@ -32,6 +32,23 @@ function StarRow({ stars }: { stars: number }) {
 
 export function ResultPage({ onReplay, onGoHome, onNextLevel }: ResultPageProps) {
   const { grantSticker } = useStickerCollection();
+
+  const {
+    score,
+    correctCount,
+    wrongCount,
+    totalQuestions,
+    maxCombo,
+    highScore,
+    level,
+    gameStartTime,
+  } = useGameStore();
+
+  const stars = calculateStars(correctCount, totalQuestions);
+  const passed = isLevelPassed(correctCount);
+  const rate = Math.round((correctCount / totalQuestions) * 100);
+  const isNewRecord = score === highScore && score > 0;
+
   const [rewardStickers, setRewardStickers] = useState<{ sticker: Sticker; isNew: boolean }[]>([]);
   const [showIndex, setShowIndex] = useState(0);
   const [totalDraws, setTotalDraws] = useState(0);
@@ -71,24 +88,8 @@ export function ResultPage({ onReplay, onGoHome, onNextLevel }: ResultPageProps)
       setRewardStickers(newOnes);
       setShowIndex(0);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const {
-    score,
-    correctCount,
-    wrongCount,
-    totalQuestions,
-    maxCombo,
-    highScore,
-    level,
-    gameStartTime,
-  } = useGameStore();
-
-  const stars = calculateStars(correctCount, totalQuestions);
-  const passed = isLevelPassed(correctCount);
-  const rate = Math.round((correctCount / totalQuestions) * 100);
-  const isNewRecord = score === highScore && score > 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 只在组件首次挂载时触发一次
 
   // 计算用时
   const timeSpent = gameStartTime ? Math.round((Date.now() - gameStartTime) / 1000) : null;
@@ -220,17 +221,34 @@ export function ResultPage({ onReplay, onGoHome, onNextLevel }: ResultPageProps)
 
       {/* ─── 操作按钮（响应式，最小高度 60px）────────── */}
       <div className="flex flex-col gap-2 sm:gap-2.5 w-full max-w-xs sm:max-w-sm relative z-10">
-        {/* 再玩一次 */}
-        <GameButton variant="primary" size="lg" onClick={onReplay} className="w-full min-h-[60px] text-base sm:text-lg">
-          🔄 再玩一次
-        </GameButton>
-
-        {/* 下一关（仅通过且未到最后一关时显示） */}
-        {passed && hasNextLevel && (
-          <GameButton variant="secondary" size="lg" onClick={onNextLevel} className="w-full min-h-[60px] text-base sm:text-lg">
-            ➡️ 下一关 · 第{level + 1}关
+        {/* 第一行：重玩 + 下一关（或再玩一次） */}
+        <div className="flex gap-2 w-full">
+          {/* 重玩本关 */}
+          <GameButton variant="secondary" size="lg" onClick={onReplay} className="flex-1 min-h-[60px] text-base sm:text-lg">
+            🔄 重玩
           </GameButton>
-        )}
+
+          {/* 下一关（仅未到最后一关时显示） */}
+          {hasNextLevel ? (
+            <GameButton
+              variant={passed ? 'primary' : 'ghost'}
+              size="lg"
+              onClick={onNextLevel}
+              className="flex-1 min-h-[60px] text-base sm:text-lg"
+            >
+              ➡️ 下一关
+            </GameButton>
+          ) : (
+            <GameButton
+              variant="primary"
+              size="lg"
+              onClick={onReplay}
+              className="flex-1 min-h-[60px] text-base sm:text-lg"
+            >
+              🔄 再玩第{level}关
+            </GameButton>
+          )}
+        </div>
 
         {/* 返回首页 */}
         <GameButton variant="ghost" size="md" onClick={onGoHome} className="w-full">
