@@ -32,14 +32,47 @@ function StarRow({ stars }: { stars: number }) {
 
 export function ResultPage({ onReplay, onGoHome, onNextLevel }: ResultPageProps) {
   const { grantSticker } = useStickerCollection();
-  const [rewardSticker, setRewardSticker] = useState<{ sticker: Sticker; isNew: boolean } | null>(null);
+  const [rewardStickers, setRewardStickers] = useState<{ sticker: Sticker; isNew: boolean }[]>([]);
+  const [showIndex, setShowIndex] = useState(0);
+  const [totalDraws, setTotalDraws] = useState(0);
 
+  // 每关成绩抽贴纸：根据星级/分数给予不同奖励
   useEffect(() => {
-    const result = grantSticker('level_complete');
-    if (result.isNew) {
-      setRewardSticker(result);
+    const drawn: { sticker: Sticker; isNew: boolean }[] = [];
+
+    // 基础奖励：完成关卡必得1次抽取
+    drawn.push(grantSticker('level_complete'));
+
+    // 额外奖励：3星 +1次
+    if (stars === 3) {
+      drawn.push(grantSticker('perfect_score'));
     }
-  }, [grantSticker]);
+
+    // 额外奖励：满分(10/10)再 +1次
+    if (correctCount === totalQuestions) {
+      drawn.push(grantSticker('perfect_score'));
+    }
+
+    // 额外奖励：单局分数 >= 150 再 +1次
+    if (score >= 150) {
+      drawn.push(grantSticker('combo_10'));
+    }
+
+    // 额外奖励：连击 >= 8 再 +1次
+    if (maxCombo >= 8) {
+      drawn.push(grantSticker('combo_10'));
+    }
+
+    setTotalDraws(drawn.length);
+
+    // 过滤出新贴纸结果，最多显示3个避免刷屏
+    const newOnes = drawn.filter((r) => r.isNew).slice(0, 3);
+    if (newOnes.length > 0) {
+      setRewardStickers(newOnes);
+      setShowIndex(0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     score,
@@ -166,12 +199,22 @@ export function ResultPage({ onReplay, onGoHome, onNextLevel }: ResultPageProps)
 
       {/* ─── 通过状态提示 ─────────────────────────────── */}
       {passed ? (
-        <p className="text-green-400 text-sm font-medium relative z-10">
-          ✅ 通关成功！答对{correctCount}题，获得{stars}星
-        </p>
+        <div className="text-center relative z-10 space-y-1">
+          <p className="text-green-400 text-sm font-medium">
+            ✅ 通关成功！答对{correctCount}题，获得{stars}星
+          </p>
+          <p className="text-pink-300 text-xs font-medium">
+            🎰 获得 {totalDraws} 次抽贴纸机会
+            {stars === 3 && ' ⭐3星加成'}
+            {correctCount === totalQuestions && ' 🌟满分加成'}
+            {score >= 150 && ' 🔥高分加成'}
+            {maxCombo >= 8 && ' ⚡连击加成'}
+          </p>
+        </div>
       ) : (
         <p className="text-red-400 text-sm font-medium relative z-10">
           ❌ 还差{totalQuestions - correctCount}题通关（需答对{PASS_THRESHOLD}题）
+          {totalDraws > 0 && <span className="text-pink-300 ml-2">🎰 获得 {totalDraws} 次抽贴纸机会</span>}
         </p>
       )}
 
@@ -195,12 +238,13 @@ export function ResultPage({ onReplay, onGoHome, onNextLevel }: ResultPageProps)
         </GameButton>
       </div>
 
-      {/* 贴纸奖励提示 */}
-      {rewardSticker && (
+      {/* 贴纸奖励提示（多个依次显示） */}
+      {rewardStickers.length > 0 && showIndex < rewardStickers.length && (
         <StickerToast
-          sticker={rewardSticker.sticker}
-          isNew={rewardSticker.isNew}
-          onClose={() => setRewardSticker(null)}
+          key={showIndex}
+          sticker={rewardStickers[showIndex].sticker}
+          isNew={rewardStickers[showIndex].isNew}
+          onClose={() => setShowIndex((p) => p + 1)}
         />
       )}
     </div>

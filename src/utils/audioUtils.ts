@@ -565,12 +565,12 @@ function getAudio(marked: string): HTMLAudioElement {
 
 /**
  * 尝试播放预录音（public/audio/ 目录）
- * 文件命名：base_pinyin_char.m4a  如 ba_八.m4a
+ * 文件命名：marked_char.m4a  如 pà_怕.m4a（带声调）
+ * 注意：基础拼音可能含有多音字母（āáǎà等），需完整保留才能命中正确文件
  */
 function tryPlayPreRecorded(marked: string): boolean {
-  const base = toBasePinyin(marked);           // 'bā' → 'ba'
-  const char = PINYIN_CHAR_MAP.get(base) ?? pinyinToChar(marked);
-  const filename = `${base}_${char}.m4a`;     // 'ba_八.m4a'
+  const char = PINYIN_CHAR_MAP.get(toBasePinyin(marked)) ?? pinyinToChar(marked);
+  const filename = `${marked}_${char}.m4a`;  // 'pà_怕.m4a'（保留声调）
   const url = `/audio/${encodeURIComponent(filename)}`;
   const audio = getAudio(marked);
 
