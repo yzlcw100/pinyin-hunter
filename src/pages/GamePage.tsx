@@ -71,6 +71,7 @@ export function GamePage({ onFinish }: GamePageProps) {
     totalQuestions,
     checkAnswer,
     nextQuestion,
+    level,
   } = useGameStore();
 
   const audio = useAudio();
@@ -84,6 +85,9 @@ export function GamePage({ onFinish }: GamePageProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [canInteract, setCanInteract] = useState(true);
+
+  // 关卡完成过渡动画（答完最后一题后、结果页前）
+  const [showLevelComplete, setShowLevelComplete] = useState(false);
 
   // 得分飘字
   const [scorePopup, setScorePopup] = useState({ trigger: false, score: 0, x: 0, y: 0 });
@@ -155,9 +159,18 @@ export function GamePage({ onFinish }: GamePageProps) {
         setTimeout(() => audio.playCombo(combo), 100);
       }
 
-      setTimeout(() => {
-        nextQuestion();
-      }, 1200);
+      // 最后一题答对：显示关卡完成过渡动画
+      if (questionIndex >= totalQuestions) {
+        setShowLevelComplete(true);
+        setTimeout(() => {
+          setShowLevelComplete(false);
+          nextQuestion();
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          nextQuestion();
+        }, 1200);
+      }
     } else {
       if (gameAreaRef.current) {
         gameAreaRef.current.classList.add('animate-screen-shake');
@@ -168,9 +181,18 @@ export function GamePage({ onFinish }: GamePageProps) {
 
       audio.playWrong();
 
-      setTimeout(() => {
-        nextQuestion();
-      }, 1600);
+      // 最后一题答错：同样显示过渡
+      if (questionIndex >= totalQuestions) {
+        setShowLevelComplete(true);
+        setTimeout(() => {
+          setShowLevelComplete(false);
+          nextQuestion();
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          nextQuestion();
+        }, 1600);
+      }
     }
   }, [canInteract, selectedIndex, checkAnswer, nextQuestion, audio, combo, score]);
 
@@ -390,6 +412,27 @@ export function GamePage({ onFinish }: GamePageProps) {
             count={8}
             onComplete={handleStarBurstComplete}
           />
+        )}
+
+        {/* ─── 关卡完成过渡动画 ─────────────────────────── */}
+        {showLevelComplete && (
+          <div className="fixed inset-0 z-[100] bg-black/80 flex flex-col items-center justify-center gap-6 animate-fade-in">
+            <p className="text-white/80 text-xl font-bold animate-bounce">
+              第{level}关 · 已完成！
+            </p>
+            <div className="text-6xl animate-scale-in">🎉</div>
+            <p className="text-yellow-400 text-4xl font-black">
+              {score}分
+            </p>
+            <div className="flex gap-2 text-4xl">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <span key={i} className="text-yellow-400 animate-star-pop" style={{ animationDelay: `${i * 150}ms` }}>
+                  ★
+                </span>
+              ))}
+            </div>
+            <p className="text-white/40 text-sm">正在进入成绩页面...</p>
+          </div>
         )}
       </div>
     </>

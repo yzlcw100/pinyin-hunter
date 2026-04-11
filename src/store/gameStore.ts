@@ -15,7 +15,7 @@ import type { GameLevel, LevelRecord } from '../utils/storageUtils';
 // 类型定义
 // ============================================================
 
-export type GamePhase = 'home' | 'playing' | 'result';
+export type GamePhase = 'home' | 'playing' | 'result' | 'transition';
 
 export interface GameQuestion {
   syllable: PinyinSyllable;
